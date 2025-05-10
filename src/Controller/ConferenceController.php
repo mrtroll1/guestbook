@@ -34,7 +34,7 @@ class ConferenceController extends AbstractController
         $offset = max(0, $request->query->getInt('offset', 0));
         $paginator = $commentRepository->getCommentPaginator($conference, $offset);
 
-        return new Response($this->$twig->render('conference/show.html.twig', [
+        return new Response($this->twig->render('conference/show.html.twig', [
             'conference' => $conference,
             'comments' => $commentRepository->findBy(['conference' => $conference], ['createdAt' => 'DESC']),
             'comments' => $paginator,
