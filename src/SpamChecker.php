@@ -13,6 +13,7 @@ class SpamChecker
     public function __construct(HttpClientInterface $client)
     {
         $this->client = $client;
+        $this->endpoint = 'some-endpoint';
         // $this->endpoint = sprintf('https://%s.rest.akismet.com/1.1/comment-check', $akismetKey);
     }
 
