@@ -10,7 +10,7 @@ use Symfony\Contracts\Cache\CacheInterface;
 
 class StepInfoCommand extends Command
 {
-    protected static $defaultname = 'app:step:info';
+    protected static $defaultName = 'app:step:info';
 
     private $cache;
 
