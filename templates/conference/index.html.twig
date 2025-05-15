@@ -2,8 +2,7 @@
 
 {% block title %}Conference Guestbook{% endblock %}
 
-{% render_esi(path('conference_header')) %}
-
 {% block body %}
+    {{ render_esi(path('conference_header')) }}
     <h2>Give your feedback!</h2>
 {% endblock %}
