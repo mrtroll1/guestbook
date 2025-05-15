@@ -36,3 +36,8 @@ services:
         tags:
             - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Conference'}
             - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Conference'}
+
+    App\Api\FilterPublishedCommentQueryExtension:
+        tags:
+            - { name: 'api_platform.doctrine.orm.query_extension.collection', priority: 10 }
+            - { name: 'api_platform.doctrine.orm.query_extension.item',       priority: 10 }

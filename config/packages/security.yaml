@@ -10,6 +10,9 @@ security:
                 class: App\Entity\Admin
                 property: username
     firewalls:
+        api:
+            pattern: ^/api
+            stateless: false
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
