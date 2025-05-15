@@ -4,6 +4,7 @@ namespace App\MessageHandler;
 
 use App\ImageOptimizer;
 use App\Message\CommentMessage;
+use App\Notification\CommentReviewNotification;
 use App\Repository\CommentRepository;
 use App\SpamChecker;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,6 +13,7 @@ use Symfony\Bridge\Twig\Mime\NotificationEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 
@@ -22,9 +24,8 @@ class CommentMessageHandler implements MessageHandlerInterface
     private $commentRepository;
     private $bus;
     private $workflow;
-    private $mailer;
+    private $notifier;
     private $imageOptimizer;
-    private $adminEmail;
     private $photoDir;
     private $logger;
 
@@ -34,9 +35,8 @@ class CommentMessageHandler implements MessageHandlerInterface
         CommentRepository $commentRepository, 
         MessageBusInterface $bus, 
         WorkflowInterface $commentStateMachine, 
-        MailerInterface $mailer, 
+        NotifierInterface $notifier,
         ImageOptimizer $imageOptimizer, 
-        string $adminEmail,
         string $photoDir,
         LoggerInterface $logger = null)
     {
@@ -45,9 +45,8 @@ class CommentMessageHandler implements MessageHandlerInterface
         $this->commentRepository = $commentRepository;
         $this->bus = $bus;
         $this->workflow = $commentStateMachine;
-        $this->mailer = $mailer;
+        $this->notifier = $notifier;
         $this->imageOptimizer = $imageOptimizer;
-        $this->adminEmail = $adminEmail;
         $this->photoDir = $photoDir;
         $this->logger = $logger;
     }
@@ -88,16 +87,9 @@ class CommentMessageHandler implements MessageHandlerInterface
             $this->workflow->apply($comment, 'optimize');
             $this->entityManager->flush();
         } elseif ($this->workflow->can($comment, 'publish') || $this->workflow->can($comment, 'publish_ham')) {
-            $this->mailer->send((new NotificationEmail())
-                ->subject('New comment posted')
-                ->htmlTemplate('emails/comment_notification.html.twig')
-                ->from($this->adminEmail)
-                ->to($this->adminEmail)
-                ->context(['comment' => $comment])
-            );
-
-            $this->workflow->apply($comment, $this->workflow->can($comment, 'publish')) ? 'publish' : 'publish_ham';
-            $this->entityManager->flush();
+            $this->notifier->send(new CommentReviewNotification($comment), ...$this->notifier->getAdminRecipients());
+            // $this->workflow->apply($comment, $this->workflow->can($comment, 'publish')) ? 'publish' : 'publish_ham';
+            // $this->entityManager->flush();
         } elseif ($this->logger) {
             $this->logger->debug('Dropping comment message', ['comment' => $comment->getId(), 'state' => $comment->getState()]);
         }
