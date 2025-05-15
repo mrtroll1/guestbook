@@ -13,7 +13,7 @@
     <h2>{{ conference }} Conference</h2>
 
     {% if comments|length > 0 %}
-        <div>There are {{ comments|length }} comments.</div>
+        <div>{{ 'nb_of_comments'|trans({count: comments|length}) }}</div>
         {% for comment in comments %}
             {% if comment.photofilename %}
                 <img src="{{ asset('uploads/photos/' ~ comment.photofilename) }}" />
