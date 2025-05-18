@@ -10,14 +10,17 @@ function App() {
     const [conferences, setConferences] = useState(null);
 
     useEffect(() => {
-        findConferences().then((conferences) => setConferences(conferences));
+        findConferences().then((conferences) => {
+            setConferences(conferences);
+            console.log(conferences);
+        });
     }, []);
 
     console.log(conferences);
 
     if (conferences === null) {
         return <div className="text-center pt-5">Loading...
-        <a href={ENV_API_ENDPOINT+'uploads/photos/'} target="_blank"></a>
+        <a href={ENV_API_ENDPOINT+'uploads/photos/'} target="_blank">link</a>
         </div>;
     }
 
